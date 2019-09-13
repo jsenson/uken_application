@@ -29,13 +29,14 @@ public class TestAStar : MonoBehaviour {
 
     [ContextMenu("Run AStar Test")]
     public void RunTest() {
-        IAStarNode[] path = AStar.CalculatePath(_grid[startPos.x, startPos.y], _grid[endPos.x, endPos.y]);
+        int turns;
+        IAStarNode[] path = AStar.CalculatePath(_grid[startPos.x, startPos.y], _grid[endPos.x, endPos.y], out turns);
         if(path.Length > 0) {
             Debug.Log("Start path:");
             for(int i = 0; i < path.Length; i++) {
                 Debug.LogFormat("({0:N}, {1:N})", path[i].GetPosition().x, path[i].GetPosition().y);
             }
-            Debug.Log("End");
+            Debug.LogFormat("End - {0} turns", turns);
         } else {
             Debug.Log("Did not find a valid path.");
         }

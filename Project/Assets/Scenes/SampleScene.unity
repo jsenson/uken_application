@@ -151,7 +151,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _rows: 10
-  _columns: 10
+  _columns: 17
   cellSize: {x: 1, y: 1}
 --- !u!4 &440140324
 Transform:
@@ -183,7 +183,7 @@ MonoBehaviour:
   _block: {fileID: 2053054121156568071, guid: 71ca9dc1e70687a44b39b345e8473de0, type: 3}
   blockChance: 0.4
   startPos: {x: 0, y: 0}
-  endPos: {x: 9, y: 9}
+  endPos: {x: 16, y: 9}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0

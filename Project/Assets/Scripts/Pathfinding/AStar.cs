@@ -9,6 +9,10 @@ public static class AStar {
         public IAStarNode node;
         public StepInfo parent;
 
+        public Vector2 direction {
+            get { return parent != null ? node.GetPosition() - parent.node.GetPosition() : Vector2.zero; }
+        }
+
         public StepInfo(IAStarNode node, StepInfo parent) {
             this.node = node;
             this.parent = parent;
@@ -17,33 +21,32 @@ public static class AStar {
 
     private static List<StepInfo> _openList;
     private static List<StepInfo> _closedList;
-    private static IAStarNode _previousNode;
 
     static AStar() {
         _openList = new List<StepInfo>();
         _closedList = new List<StepInfo>();
-        _previousNode = null;
     }
 
-    public static IAStarNode[] CalculatePath(IAStarNode source, IAStarNode target, int maxTurnsAllowed = 2) {
+    public static IAStarNode[] CalculatePath(IAStarNode source, IAStarNode target, out int directionChangeCount) {
+        directionChangeCount = 0;
+
         if(source == null || target == null) {
             Debug.LogWarning("AStar.CalculatePath called with a null value.  Returned path will be empty.");
             return new IAStarNode[0];
         }
 
-        // StepInfo currentStep = new StepInfo(source, null);
         _openList.Clear();
         _closedList.Clear();
-        _previousNode = null;
 
         _openList.Add(new StepInfo(source, null));
 
         do {
             int currentIndex;
             StepInfo currentStep = GetLowestFScore(_openList, out currentIndex);
-            Debug.LogFormat("Current Step: ({0:N}, {1:N})", currentStep.node.GetPosition().x, currentStep.node.GetPosition().y);
 
             if(currentStep.node == target) {
+                // Subtract 1 from the turn count since the first move is always considered a change in direction.
+                directionChangeCount = currentStep.turns - 1;
                 return ExtractPath(currentStep);
             }
 
@@ -51,27 +54,35 @@ public static class AStar {
             _closedList.Add(currentStep);
 
             IAStarNode[] neighbours = currentStep.node.GetNeighbours();
-            Debug.Log("Neighbour count = " + neighbours.Length);
+
             foreach(IAStarNode n in neighbours) {
-                Debug.LogFormat("Checking Neighbour: ({0:N}, {1:N})", n.GetPosition().x, n.GetPosition().y);
                 if(_closedList.Find(x => x.node == n) != null) continue;
 
+                // Immediately close any nodes that aren't walkable
                 if(n.pathfindingWeight < 0) {
-                    Debug.Log("Weight < 0: Adding to closed list");
                     _closedList.Add(new StepInfo(n, currentStep));
                     continue;
                 }
 
                 StepInfo neighbour = new StepInfo(n, currentStep);
 
-                // Should make the increase to g customizable via the IAStarNode interface but just adding 1 for each step since this is a simple grid with only diagonal movement.
+                bool changedDirection = neighbour.direction != currentStep.direction;
+                // Should make the increase to g customizable via the IAStarNode interface but just adding 1 for each step since this is a simple grid with no diagonal movement.
                 neighbour.g = currentStep.g + 1;
                 // Same here.  Should make the Heuristic customizable if I was making this more fully featured.
-                neighbour.f = neighbour.g + CalculateH(n, target);
+                neighbour.f = neighbour.g + CalculateH(n, target, changedDirection);
+                neighbour.turns = currentStep.turns;
+                if(changedDirection) neighbour.turns++;
 
-                if(_openList.Find(x => x.node == neighbour.node) == null) {
-                    Debug.LogFormat("Added to Open list: g = {0:N2}, f = {1:N2}", neighbour.g, neighbour.f);
+                StepInfo existingOpenStep = _openList.Find(x => x.node == neighbour.node);
+                if(existingOpenStep == null) {
                     _openList.Add(neighbour);
+                } else if(neighbour.f < existingOpenStep.f) {
+                    // Copy values into the existing step so we don't have to traverse the List again to remove it.
+                    existingOpenStep.g = neighbour.g;
+                    existingOpenStep.f = neighbour.f;
+                    existingOpenStep.turns = neighbour.turns;
+                    existingOpenStep.parent = neighbour.parent;
                 }
             }
         } while(_openList.Count > 0);
@@ -79,12 +90,15 @@ public static class AStar {
         return new IAStarNode[0];
     }
 
-    // Simple Manhatten distance heuristic
-    private static float CalculateH(IAStarNode source, IAStarNode target) {
+    // Simple Manhatten distance heuristic since we want to tend toward 'squared' paths.
+    private static float CalculateH(IAStarNode source, IAStarNode target, bool directionChanged) {
         Vector2 sourcePos = source.GetPosition();
         Vector2 targetPos = target.GetPosition();
-        //return Mathf.Abs(targetPos.x - sourcePos.x) + Mathf.Abs(targetPos.y - sourcePos.y);
-        return (targetPos - sourcePos).magnitude;
+
+        float h = Mathf.Abs(targetPos.x - sourcePos.x) + Mathf.Abs(targetPos.y - sourcePos.y);
+        if(directionChanged) h *= 100; // Add a severe penalty for changing directions to encourage the fewest possible
+        
+        return h;
     }
 
     private static StepInfo GetLowestFScore(List<StepInfo> stepList, out int index) {
