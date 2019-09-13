@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Priority_Queue;
 
 public static class AStar {
     private class StepInfo {
@@ -56,23 +57,20 @@ public static class AStar {
             IAStarNode[] neighbours = currentStep.node.GetNeighbours();
 
             foreach(IAStarNode n in neighbours) {
-                if(_closedList.Find(x => x.node == n) != null) continue;
-
-                // Immediately close any nodes that aren't walkable
-                if(n.pathfindingWeight < 0) {
-                    _closedList.Add(new StepInfo(n, currentStep));
-                    continue;
-                }
+                if(n.pathfindingWeight < 0 || _closedList.Find(x => x.node == n) != null) continue;
 
                 StepInfo neighbour = new StepInfo(n, currentStep);
 
-                bool changedDirection = neighbour.direction != currentStep.direction;
-                // Should make the increase to g customizable via the IAStarNode interface but just adding 1 for each step since this is a simple grid with no diagonal movement.
-                neighbour.g = currentStep.g + 1;
-                // Same here.  Should make the Heuristic customizable if I was making this more fully featured.
-                neighbour.f = neighbour.g + CalculateH(n, target, changedDirection);
+                neighbour.g = currentStep.g + n.pathfindingWeight;
                 neighbour.turns = currentStep.turns;
-                if(changedDirection) neighbour.turns++;
+
+                if(neighbour.direction != currentStep.direction) {
+                    neighbour.g += 100; // Add a severe penalty for changing directions to encourage the fewest possible
+                    neighbour.turns++;
+                }
+
+                // Same here.  Should make the Heuristic customizable if I was making this more fully featured.
+                neighbour.f = neighbour.g + CalculateH(n, target);
 
                 StepInfo existingOpenStep = _openList.Find(x => x.node == neighbour.node);
                 if(existingOpenStep == null) {
@@ -91,14 +89,10 @@ public static class AStar {
     }
 
     // Simple Manhatten distance heuristic since we want to tend toward 'squared' paths.
-    private static float CalculateH(IAStarNode source, IAStarNode target, bool directionChanged) {
+    private static float CalculateH(IAStarNode source, IAStarNode target) {
         Vector2 sourcePos = source.GetPosition();
         Vector2 targetPos = target.GetPosition();
-
-        float h = Mathf.Abs(targetPos.x - sourcePos.x) + Mathf.Abs(targetPos.y - sourcePos.y);
-        if(directionChanged) h *= 100; // Add a severe penalty for changing directions to encourage the fewest possible
-        
-        return h;
+        return Mathf.Abs(targetPos.x - sourcePos.x) + Mathf.Abs(targetPos.y - sourcePos.y);
     }
 
     private static StepInfo GetLowestFScore(List<StepInfo> stepList, out int index) {
@@ -129,6 +123,7 @@ public static class AStar {
             pathList.Add(step.node);
             step = step.parent;
         }
+        pathList.Add(step.node);
 
         pathList.Reverse();
         return pathList.ToArray();

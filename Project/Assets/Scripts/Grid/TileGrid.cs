@@ -49,6 +49,10 @@ public class TileGrid : MonoBehaviour {
         }
     }
 
+    public Vector2 ConvertToWorldPosition(Vector2 coordinates) {
+        return ConvertToWorldPosition((int)coordinates.x, (int)coordinates.y);
+    }
+
     public Vector2 ConvertToWorldPosition(int column, int row) {
         Vector2 bottomLeft = new Vector2(transform.position.x - (columns - 1) * cellSize.x * 0.5f, transform.position.y - (rows - 1) * cellSize.y * 0.5f);
         return new Vector2(bottomLeft.x + column * cellSize.x, bottomLeft.y + row * cellSize.y);
