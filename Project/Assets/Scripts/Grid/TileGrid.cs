@@ -5,7 +5,7 @@ using UnityEngine;
 public class TileGrid : MonoBehaviour {
     [SerializeField] private int _rows = 10;
     [SerializeField] private int _columns = 10;
-    [SerializeField] private Vector2 cellSize = Vector2.one;
+    [SerializeField] private Vector2 _cellSize = Vector2.one;
 
     public int rows { get { return _rows; } }
     public int columns { get { return _columns; } }
@@ -22,6 +22,8 @@ public class TileGrid : MonoBehaviour {
 
     public void ResizeGrid(int columnCount, int rowCount) {
         if(_grid != null) Clear();
+        _columns = columnCount;
+        _rows = rowCount;
         _grid = new GridNode[columnCount, rowCount];
 
         for(int x = 0; x < columnCount; x++) {
@@ -54,8 +56,8 @@ public class TileGrid : MonoBehaviour {
     }
 
     public Vector2 ConvertToWorldPosition(int column, int row) {
-        Vector2 bottomLeft = new Vector2(transform.position.x - (columns - 1) * cellSize.x * 0.5f, transform.position.y - (rows - 1) * cellSize.y * 0.5f);
-        return new Vector2(bottomLeft.x + column * cellSize.x, bottomLeft.y + row * cellSize.y);
+        Vector2 bottomLeft = new Vector2(transform.position.x - (columns - 1) * _cellSize.x * 0.5f, transform.position.y - (rows - 1) * _cellSize.y * 0.5f);
+        return new Vector2(bottomLeft.x + column * _cellSize.x, bottomLeft.y + row * _cellSize.y);
     }
 
 #if UNITY_EDITOR
@@ -66,16 +68,16 @@ public class TileGrid : MonoBehaviour {
     }
 
     void OnGUI() {
-        Vector2 bottomLeft = new Vector2(transform.position.x - columns * cellSize.x * 0.5f, transform.position.y - rows * cellSize.y * 0.5f);
-        Vector2 topRight = new Vector2(bottomLeft.x + columns * cellSize.x, bottomLeft.y + rows * cellSize.y);
+        Vector2 bottomLeft = new Vector2(transform.position.x - columns * _cellSize.x * 0.5f, transform.position.y - rows * _cellSize.y * 0.5f);
+        Vector2 topRight = new Vector2(bottomLeft.x + columns * _cellSize.x, bottomLeft.y + rows * _cellSize.y);
         
         for(int x = 0; x <= columns; x++) {
-            float currentX = bottomLeft.x + cellSize.x * x;
+            float currentX = bottomLeft.x + _cellSize.x * x;
             Debug.DrawLine(new Vector2(currentX, bottomLeft.y), new Vector2(currentX, topRight.y));
         }
 
         for(int y = 0; y <= rows; y++) {
-            float currentY = bottomLeft.y + cellSize.y * y;
+            float currentY = bottomLeft.y + _cellSize.y * y;
             Debug.DrawLine(new Vector2(bottomLeft.x, currentY), new Vector2(topRight.x, currentY));
         }
     }

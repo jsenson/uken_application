@@ -4,7 +4,7 @@ using UnityEngine;
 public class GridNode : IAStarNode {
     public float pathfindingWeight { get; set; }
 
-    public GameObject tile { get; set; }
+    public SpriteTile tile { get; set; }
     private Vector2 _position;
     private List<IAStarNode> _neighbours;
 

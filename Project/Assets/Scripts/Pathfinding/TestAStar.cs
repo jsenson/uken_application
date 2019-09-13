@@ -26,7 +26,7 @@ public class TestAStar : MonoBehaviour {
                 if(_grid[x, y].tile == null && Random.Range(0f, 1f) < blockChance) {
                     GameObject block = GameObject.Instantiate(_block, (Vector3)_grid.ConvertToWorldPosition(x, y), Quaternion.identity);
                     _grid[x,y].pathfindingWeight = -1;
-                    _grid[x,y].tile = block;
+                    // _grid[x,y].tile = block;
                 }
             }
         }
