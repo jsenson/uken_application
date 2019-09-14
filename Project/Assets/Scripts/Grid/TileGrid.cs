@@ -9,6 +9,7 @@ public class TileGrid : MonoBehaviour {
 
     public int rows { get { return _rows; } }
     public int columns { get { return _columns; } }
+    public int tileCount { get { return GetTileCount(); } }
 
     public GridNode this[int x, int y] {
         get { return _grid != null ? _grid[x, y] : null; }
@@ -60,6 +61,18 @@ public class TileGrid : MonoBehaviour {
         return new Vector2(bottomLeft.x + column * _cellSize.x, bottomLeft.y + row * _cellSize.y);
     }
 
+    public int GetTileCount() {
+        int count = 0;
+
+        for(int x = 0; x < _grid.GetLength(0); x++) {
+            for(int y = 0; y < _grid.GetLength(1); y++) {
+                if(_grid[x,y].tile != null) count++;
+            }
+        }
+
+        return count;
+    }
+
 #if UNITY_EDITOR
     void OnValidate() {
         _rows = Mathf.Clamp(rows, 2, 9999);
@@ -68,17 +81,10 @@ public class TileGrid : MonoBehaviour {
     }
 
     void OnGUI() {
-        Vector2 bottomLeft = new Vector2(transform.position.x - columns * _cellSize.x * 0.5f, transform.position.y - rows * _cellSize.y * 0.5f);
-        Vector2 topRight = new Vector2(bottomLeft.x + columns * _cellSize.x, bottomLeft.y + rows * _cellSize.y);
-        
-        for(int x = 0; x <= columns; x++) {
-            float currentX = bottomLeft.x + _cellSize.x * x;
-            Debug.DrawLine(new Vector2(currentX, bottomLeft.y), new Vector2(currentX, topRight.y));
-        }
-
-        for(int y = 0; y <= rows; y++) {
-            float currentY = bottomLeft.y + _cellSize.y * y;
-            Debug.DrawLine(new Vector2(bottomLeft.x, currentY), new Vector2(topRight.x, currentY));
+        for(int x = 0; x < _grid.GetLength(0); x++) {
+            for(int y = 0; y < _grid.GetLength(1); y++) {
+                _grid[x,y].DrawDebug(this, _cellSize);
+            }
         }
     }
 #endif

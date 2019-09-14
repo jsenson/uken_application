@@ -5,12 +5,13 @@ public class GridNode : IAStarNode {
     public float pathfindingWeight { get; set; }
 
     public SpriteTile tile { get; set; }
-    private Vector2 _position;
+    public Vector2 coordinates { get; private set; }
+
     private List<IAStarNode> _neighbours;
 
-    public GridNode(Vector2 position) {
+    public GridNode(Vector2 coordinates) {
         _neighbours = new List<IAStarNode>();
-        _position = position;
+        this.coordinates = coordinates;
         pathfindingWeight = 1;
     }
 
@@ -26,15 +27,23 @@ public class GridNode : IAStarNode {
         return _neighbours.ToArray();
     }
 
-    public Vector2 GetPosition() {
-        return _position;
+    public void Clear() {
+        if(tile != null) tile = null;
+        pathfindingWeight = 1;
     }
 
-    public void Clear() {
-        if(tile != null) {
-            GameObject.Destroy(tile);
-            tile = null;
-            pathfindingWeight = 1;
-        }
+#if UNITY_EDITOR
+    public void DrawDebug(TileGrid parentGrid, Vector2 size) {
+        Vector2 pos = parentGrid.ConvertToWorldPosition(coordinates);
+        Vector2 start = pos - size * 0.49f;
+        Vector2 right = Vector2.right * size * 0.98f;
+        Vector2 up = Vector2.up * size * 0.98f;
+        Color color = pathfindingWeight < 0 ? Color.red : Color.white;
+
+        Debug.DrawLine(start, start + up, color);
+        Debug.DrawLine(start + up, start + up + right, color);
+        Debug.DrawLine(start + up + right, start + right, color);
+        Debug.DrawLine(start, start + right, color);
     }
+#endif
 }

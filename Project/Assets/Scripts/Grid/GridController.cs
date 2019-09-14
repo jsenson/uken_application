@@ -5,6 +5,8 @@ using ToN.ObjectPooling;
 
 [RequireComponent(typeof(TileGrid))]
 public class GridController : MonoBehaviour {
+    public static event System.Action onAllTilesCleared;
+
     [SerializeField] private SpriteTile _tilePrefab = null;
     [SerializeField] private SpriteTileInfo[] _tileSet = null;
 
@@ -14,6 +16,14 @@ public class GridController : MonoBehaviour {
     void Awake() {
         _grid = GetComponent<TileGrid>();
         ResetGrid();
+    }
+
+    void OnEnable() {
+        SpriteTile.onTilesMatched += OnTilesMatched;
+    }
+
+    void OnDisable() {
+        SpriteTile.onTilesMatched -= OnTilesMatched;
     }
 
     void ResetGrid() {
@@ -40,6 +50,7 @@ public class GridController : MonoBehaviour {
         }
     }
 
+    // TODO: Rewrite to generate a solvable grid from the beginning.  Don't shuffle these and pick random locations in ResetGrid while pathing to make sure they've valid.
     SpriteTileInfo[] GetRandomTilePairs(int uniqueTileCount, int totalTileCount) {
         if(uniqueTileCount > _tileSet.Length) {
             Debug.LogWarning("GridController: Not enough unique tiles in tileSet.");
@@ -60,5 +71,19 @@ public class GridController : MonoBehaviour {
         tiles.Shuffle();
 
         return tiles;
+    }
+
+    void OnTilesMatched(SpriteTile tile1, SpriteTile tile2) {
+        _tilePool.Push(tile1);
+        _tilePool.Push(tile2);
+
+        if(_grid.tileCount == 0) {
+            OnAllTilesCleared();
+        }
+    }
+
+    void OnAllTilesCleared() {
+        Debug.Log("Game over!");
+        if(onAllTilesCleared != null) onAllTilesCleared();
     }
 }

@@ -49,7 +49,7 @@ public class TestAStar : MonoBehaviour {
         line.positionCount = path.Length;
 
         for(int i = 0; i < path.Length; i++) {
-            line.SetPosition(i, _grid.ConvertToWorldPosition(path[i].GetPosition()));
+            line.SetPosition(i, _grid.ConvertToWorldPosition(path[i].coordinates));
         }
 
         yield return new WaitForSeconds(5);

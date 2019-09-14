@@ -10,7 +10,7 @@ public static class AStar {
         public StepInfo parent;
 
         public Vector2 direction {
-            get { return parent != null ? node.GetPosition() - parent.node.GetPosition() : Vector2.zero; }
+            get { return parent != null ? node.coordinates - parent.node.coordinates : Vector2.zero; }
         }
 
         public StepInfo(IAStarNode node, StepInfo parent) {
@@ -28,7 +28,7 @@ public static class AStar {
     }
 
     public static IAStarNode[] CalculatePath(IAStarNode source, IAStarNode target, out int directionChangeCount) {
-        directionChangeCount = 0;
+        directionChangeCount = int.MaxValue;
 
         if(source == null || target == null) {
             Debug.LogWarning("AStar.CalculatePath called with a null value.  Returned path will be empty.");
@@ -56,25 +56,23 @@ public static class AStar {
             IAStarNode[] neighbours = currentStep.node.GetNeighbours();
 
             foreach(IAStarNode n in neighbours) {
-                if(n.pathfindingWeight < 0 || _closedList.Find(x => x.node == n) != null) continue;
-
                 StepInfo neighbour = new StepInfo(n, currentStep);
+                if(n.pathfindingWeight < 0 || _closedList.Find(x => x.node == neighbour.node && x.direction == neighbour.direction) != null) continue;
 
                 neighbour.g = currentStep.g + n.pathfindingWeight;
                 neighbour.turns = currentStep.turns;
 
                 if(neighbour.direction != currentStep.direction) {
-                    neighbour.g += 100; // Add a severe penalty for changing directions to encourage the fewest possible
+                    neighbour.g += 100; // Add a severe penalty for changing directions to encourage the fewest possible turns
                     neighbour.turns++;
                 }
 
-                // Same here.  Should make the Heuristic customizable if I was making this more fully featured.
                 neighbour.f = neighbour.g + CalculateH(n, target);
+                StepInfo existingOpenStep = _openList.Find(x => x.node == neighbour.node && x.direction == neighbour.direction);
 
-                StepInfo existingOpenStep = _openList.Find(x => x.node == neighbour.node);
-                if(existingOpenStep == null) {
+                if(existingOpenStep == null || existingOpenStep.direction != neighbour.direction) {
                     _openList.Add(neighbour);
-                } else if(neighbour.f < existingOpenStep.f) {
+                } else if(neighbour.g < existingOpenStep.g) {
                     // Copy values into the existing step so we don't have to traverse the List again to remove it.
                     existingOpenStep.g = neighbour.g;
                     existingOpenStep.f = neighbour.f;
@@ -89,8 +87,8 @@ public static class AStar {
 
     // Simple Manhatten distance heuristic since we want to tend toward 'squared' paths.
     private static float CalculateH(IAStarNode source, IAStarNode target) {
-        Vector2 sourcePos = source.GetPosition();
-        Vector2 targetPos = target.GetPosition();
+        Vector2 sourcePos = source.coordinates;
+        Vector2 targetPos = target.coordinates;
         return Mathf.Abs(targetPos.x - sourcePos.x) + Mathf.Abs(targetPos.y - sourcePos.y);
     }
 
@@ -126,5 +124,17 @@ public static class AStar {
 
         pathList.Reverse();
         return pathList.ToArray();
+    }
+
+    public static void LogPath(IAStarNode[] path, int turns) {
+        var sb = new System.Text.StringBuilder("Path: ");
+        sb.Append(turns);
+        sb.Append(" turns:\n");
+
+        foreach(IAStarNode node in path) {
+            sb.AppendLine(node.coordinates.ToString());
+        }
+
+        Debug.Log(sb.ToString());
     }
 }

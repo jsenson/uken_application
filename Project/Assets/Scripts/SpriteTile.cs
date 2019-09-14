@@ -10,12 +10,13 @@ public class SpriteTile : MonoBehaviour, IPointerClickHandler {
     
     [SerializeField] private SpriteTileInfo _info = null;
 
-    public SpriteTileInfo tileInfo;
-
     public bool highlighted {
         get { return _highlighted; }
         set { SetHighlighted(value); }
     }
+
+    public GridNode gridNode { get { return _currentNode; } }
+    public SpriteTileInfo tileInfo { get { return _info; } }
 
     private bool _highlighted = false;
     private SpriteRenderer _renderer;
@@ -43,30 +44,32 @@ public class SpriteTile : MonoBehaviour, IPointerClickHandler {
         if(_currentNode != null) {
             _currentNode.tile = this;
             _currentNode.pathfindingWeight = -1;
-            transform.position = grid.ConvertToWorldPosition(_currentNode.GetPosition());
+            transform.position = grid.ConvertToWorldPosition(_currentNode.coordinates);
         }
     }
 
     public void SetHighlighted(bool highlighted) {
-        if(tileInfo != null) {
+        if(_info != null) {
             _highlighted = highlighted;
-            _renderer.color = _highlighted ? tileInfo.highlightColor : tileInfo.defaultColor;
+            _renderer.color = _highlighted ? _info.highlightColor : _info.defaultColor;
         }
     }
 
     public bool Matches(SpriteTile other) {
-        return other.tileInfo.tileName.Equals(tileInfo.tileName);
+        return other._info.tileName.Equals(_info.tileName);
     }
 
     public static void MatchTiles(SpriteTile tile1, SpriteTile tile2) {
-        if(onTilesMatched != null) onTilesMatched(tile1, tile2);
+        if(tile1._currentNode != null) tile1._currentNode.Clear();
+        if(tile2._currentNode != null) tile2._currentNode.Clear();
 
-        Destroy(tile1.gameObject);
-        Destroy(tile2.gameObject);
+        // TODO: Add LineManager to spawn a path line
+        // TODO: Animate the tiles moving together with a MatchAnimation class before calling onTileMatched so the GridController can add them back to the pool.
+        // TODO: Move this to after the animation plays out.
+        if(onTilesMatched != null) onTilesMatched(tile1, tile2);
     }
 
     public void OnPointerClick(PointerEventData eventData) {
-        Debug.Log("Tile " + _info.tileName + " clicked!");
         if(onTileClicked != null) onTileClicked(this);
     }
 }
