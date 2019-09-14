@@ -44,7 +44,7 @@ public class GridController : MonoBehaviour {
                 if(tiles[i] != null) {
                     SpriteTile tile = _tilePool.Pop();
                     tile.SetSpriteTileInfo(tiles[i]);
-                    tile.SetGridNode(_grid[x,y], _grid);
+                    tile.SetGridNode(_grid[x,y]);
                 }
             }
         }

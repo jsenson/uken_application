@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-[RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(SpriteRenderer)), RequireComponent(typeof(BoxCollider2D))]
 public class SpriteTile : MonoBehaviour, IPointerClickHandler {
     public static event System.Action<SpriteTile> onTileClicked;
     public static event System.Action<SpriteTile, SpriteTile> onTilesMatched;
@@ -20,10 +20,12 @@ public class SpriteTile : MonoBehaviour, IPointerClickHandler {
 
     private bool _highlighted = false;
     private SpriteRenderer _renderer;
+    private BoxCollider2D _collider;
     private GridNode _currentNode = null;
 
     void Awake() {
         _renderer = GetComponent<SpriteRenderer>();
+        _collider = GetComponent<BoxCollider2D>();
         SetSpriteTileInfo(_info);
     }
 
@@ -33,7 +35,7 @@ public class SpriteTile : MonoBehaviour, IPointerClickHandler {
         SetHighlighted(highlighted);
     }
 
-    public void SetGridNode(GridNode node, TileGrid grid) {
+    public void SetGridNode(GridNode node) {
         if(_currentNode != null) {
             _currentNode.tile = null;
             _currentNode.pathfindingWeight = 1;
@@ -44,7 +46,7 @@ public class SpriteTile : MonoBehaviour, IPointerClickHandler {
         if(_currentNode != null) {
             _currentNode.tile = this;
             _currentNode.pathfindingWeight = -1;
-            transform.position = grid.ConvertToWorldPosition(_currentNode.coordinates);
+            transform.position = _currentNode.worldPosition;
         }
     }
 
@@ -53,6 +55,10 @@ public class SpriteTile : MonoBehaviour, IPointerClickHandler {
             _highlighted = highlighted;
             _renderer.color = _highlighted ? _info.highlightColor : _info.defaultColor;
         }
+    }
+
+    public void SetColliderEnabled(bool enabled) {
+        _collider.enabled = enabled;
     }
 
     public bool Matches(SpriteTile other) {

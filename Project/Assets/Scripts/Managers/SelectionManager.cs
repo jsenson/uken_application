@@ -27,10 +27,10 @@ public class SelectionManager : MonoBehaviour {
                 sender.gridNode.pathfindingWeight = 1;
                 IAStarNode[] path = AStar.CalculatePath(_currentTile.gridNode, sender.gridNode, out turns);
                 sender.gridNode.pathfindingWeight = oldWeight;
-                AStar.LogPath(path, turns);
+                //AStar.LogPath(path, turns);
 
                 if(turns <= _maxPathTurns) {
-                    SpriteTile.MatchTiles(_currentTile, sender);
+                    _currentTile.gameObject.AddComponent<MatchAnimation>().Play(_currentTile, sender, path);
                     SetCurrentTile(null);
                 } else {
                     SetCurrentTile(sender);

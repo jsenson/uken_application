@@ -29,7 +29,7 @@ public class TileGrid : MonoBehaviour {
 
         for(int x = 0; x < columnCount; x++) {
             for(int y = 0; y < rowCount; y++) {
-                _grid[x, y] = new GridNode(new Vector2(x, y));
+                _grid[x, y] = new GridNode(new Vector2(x, y), this);
                 
                 if(x > 0) {
                     _grid[x, y].AddNeighbour(_grid[x-1, y]);
@@ -83,7 +83,7 @@ public class TileGrid : MonoBehaviour {
     void OnGUI() {
         for(int x = 0; x < _grid.GetLength(0); x++) {
             for(int y = 0; y < _grid.GetLength(1); y++) {
-                _grid[x,y].DrawDebug(this, _cellSize);
+                _grid[x,y].DrawDebug(_cellSize);
             }
         }
     }

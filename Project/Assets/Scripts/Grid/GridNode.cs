@@ -6,11 +6,14 @@ public class GridNode : IAStarNode {
 
     public SpriteTile tile { get; set; }
     public Vector2 coordinates { get; private set; }
+    public Vector2 worldPosition { get { return _grid != null ? _grid.ConvertToWorldPosition(coordinates) : coordinates; } }
 
     private List<IAStarNode> _neighbours;
+    private TileGrid _grid;
 
-    public GridNode(Vector2 coordinates) {
+    public GridNode(Vector2 coordinates, TileGrid parentGrid) {
         _neighbours = new List<IAStarNode>();
+        _grid = parentGrid;
         this.coordinates = coordinates;
         pathfindingWeight = 1;
     }
@@ -33,9 +36,8 @@ public class GridNode : IAStarNode {
     }
 
 #if UNITY_EDITOR
-    public void DrawDebug(TileGrid parentGrid, Vector2 size) {
-        Vector2 pos = parentGrid.ConvertToWorldPosition(coordinates);
-        Vector2 start = pos - size * 0.49f;
+    public void DrawDebug(Vector2 size) {
+        Vector2 start = worldPosition - size * 0.49f;
         Vector2 right = Vector2.right * size * 0.98f;
         Vector2 up = Vector2.up * size * 0.98f;
         Color color = pathfindingWeight < 0 ? Color.red : Color.white;
