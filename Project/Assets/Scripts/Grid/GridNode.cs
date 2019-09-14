@@ -7,6 +7,7 @@ public class GridNode : IAStarNode {
     public SpriteTile tile { get; set; }
     public Vector2 coordinates { get; private set; }
     public Vector2 worldPosition { get { return _grid != null ? _grid.ConvertToWorldPosition(coordinates) : coordinates; } }
+    public Vector2 size { get { return _grid != null ? _grid.cellSize : Vector2.one; } }
 
     private List<IAStarNode> _neighbours;
     private TileGrid _grid;

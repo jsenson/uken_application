@@ -15,7 +15,8 @@ public class GridController : MonoBehaviour {
 
     void Awake() {
         _grid = GetComponent<TileGrid>();
-        ResetGrid();
+        GameSettings.LevelSettings maxSettings = GameSettings.GetLevelSettings(int.MaxValue);
+        _tilePool = new GameObjectPool<SpriteTile>(_tilePrefab, transform, maxSettings.gridSize.x * maxSettings.gridSize.y, 10);
     }
 
     void OnEnable() {
@@ -26,15 +27,14 @@ public class GridController : MonoBehaviour {
         SpriteTile.onTilesMatched -= OnTilesMatched;
     }
 
-    void ResetGrid() {
-        if(_tilePool != null) _tilePool.Clear();
-        _grid.ResizeGrid(14, 10); // TODO: Change the grid size based on level
-        int tileCount = (_grid.columns - 2) * (_grid.rows - 2);
-        
-        _tilePool = new GameObjectPool<SpriteTile>(_tilePrefab, transform, tileCount, 10);
+    public void InitializeGrid() {
+        _grid.Clear(_tilePool);
+        GameSettings.LevelSettings settings = GameSettings.currentLevelSettings;
 
-        // TODO: Change the number of unique tiles based on level.
-        SpriteTileInfo[] tiles = GetRandomTilePairs(_tileSet.Length, tileCount);
+        _grid.ResizeGrid(settings.gridSize.x + 2, settings.gridSize.y + 2);
+        int tileCount = settings.gridSize.x * settings.gridSize.y;
+
+        SpriteTileInfo[] tiles = GetRandomTilePairs(settings.uniqueTileCount, tileCount);
 
         // Fill the grid leaving cells around the border empty
         for(int x = 1; x < _grid.columns - 1; x++) {
@@ -45,6 +45,8 @@ public class GridController : MonoBehaviour {
                     SpriteTile tile = _tilePool.Pop();
                     tile.SetSpriteTileInfo(tiles[i]);
                     tile.SetGridNode(_grid[x,y]);
+                    tile.SetHighlighted(false);
+                    tile.SetColliderEnabled(true);
                 }
             }
         }
@@ -85,5 +87,6 @@ public class GridController : MonoBehaviour {
     void OnAllTilesCleared() {
         Debug.Log("Game over!");
         if(onAllTilesCleared != null) onAllTilesCleared();
+        GameManager.Instance.LoadNextLevel();
     }
 }

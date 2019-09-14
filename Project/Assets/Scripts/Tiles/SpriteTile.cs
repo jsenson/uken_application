@@ -47,6 +47,11 @@ public class SpriteTile : MonoBehaviour, IPointerClickHandler {
             _currentNode.tile = this;
             _currentNode.pathfindingWeight = -1;
             transform.position = _currentNode.worldPosition;
+            if(_renderer.sprite != null) {
+                Vector3 scale = _currentNode.size / _renderer.sprite.bounds.size;
+                float maxScale = Mathf.Max(scale.x, scale.y);
+                transform.localScale = Vector3.one * maxScale;
+            }
         }
     }
 

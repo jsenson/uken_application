@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using ToN.ObjectPooling;
 
 public class TileGrid : MonoBehaviour {
     [SerializeField] private int _rows = 10;
@@ -10,6 +11,7 @@ public class TileGrid : MonoBehaviour {
     public int rows { get { return _rows; } }
     public int columns { get { return _columns; } }
     public int tileCount { get { return GetTileCount(); } }
+    public Vector2 cellSize { get { return _cellSize; } }
 
     public GridNode this[int x, int y] {
         get { return _grid != null ? _grid[x, y] : null; }
@@ -44,10 +46,12 @@ public class TileGrid : MonoBehaviour {
         }
     }
 
-    public void Clear() {
+    public void Clear(GameObjectPool<SpriteTile> tilePool = null) {
         for(int x = 0; x < _grid.GetLength(0); x++) {
             for(int y = 0; y < _grid.GetLength(1); y++) {
-                _grid[x, y].Clear();
+                GridNode n = _grid[x, y];
+                if(tilePool != null && n.tile != null) tilePool.Push(n.tile);
+                n.Clear();
             }
         }
     }
