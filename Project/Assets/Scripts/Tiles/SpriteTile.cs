@@ -74,9 +74,9 @@ public class SpriteTile : MonoBehaviour, IPointerClickHandler {
         if(tile1._currentNode != null) tile1._currentNode.Clear();
         if(tile2._currentNode != null) tile2._currentNode.Clear();
 
-        // TODO: Add LineManager to spawn a path line
-        // TODO: Animate the tiles moving together with a MatchAnimation class before calling onTileMatched so the GridController can add them back to the pool.
-        // TODO: Move this to after the animation plays out.
+        GameSettings.score += tile1._info.pointValue;
+        GameSettings.score += tile2._info.pointValue;
+
         if(onTilesMatched != null) onTilesMatched(tile1, tile2);
     }
 

@@ -5,6 +5,7 @@ using ToN.Singletons;
 
 public class GameManager : MonoBehaviourSingleton<GameManager> {
     [SerializeField] private GridController _gridController = null;
+
     protected override bool Awake() {
         if(base.Awake()) return false;
 
@@ -16,6 +17,8 @@ public class GameManager : MonoBehaviourSingleton<GameManager> {
     void Start() {
         // Start level one after the grid has initialized in Awake
         _gridController.InitializeGrid();
+        TimerBar.Instance.Reset();
+        TimerBar.Instance.Play();
     }
 
     public void LoadNextLevel() {
@@ -24,6 +27,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager> {
         } else {
             GameSettings.level++;
             _gridController.InitializeGrid();
+            TimerBar.Instance.Play();
         }
     }
 }
