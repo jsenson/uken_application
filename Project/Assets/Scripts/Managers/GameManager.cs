@@ -4,6 +4,8 @@ using UnityEngine;
 using ToN.Singletons;
 
 public class GameManager : MonoBehaviourSingleton<GameManager> {
+    public static event System.Action onGameComplete;
+
     [SerializeField] private GridController _gridController = null;
 
     protected override bool Awake() {
@@ -16,18 +18,31 @@ public class GameManager : MonoBehaviourSingleton<GameManager> {
 
     void Start() {
         // Start level one after the grid has initialized in Awake
-        _gridController.InitializeGrid();
         TimerBar.Instance.Reset();
-        TimerBar.Instance.Play();
+        StartGame();
     }
 
     public void LoadNextLevel() {
         if(GameSettings.level == GameSettings.maxLevel) {
-            Debug.Log("Level 3 complete!");
+            if(onGameComplete != null) onGameComplete();
         } else {
             GameSettings.level++;
-            _gridController.InitializeGrid();
-            TimerBar.Instance.Play();
+            StartGame();
         }
+    }
+
+    public void ResetGame() {
+        GameSettings.level = 1;
+        GameSettings.score = 0;
+        StartGame();
+    }
+
+    public void QuitGame() {
+        Application.Quit();
+    }
+
+    void StartGame() {
+        _gridController.InitializeGrid();
+        TimerBar.Instance.Play();
     }
 }

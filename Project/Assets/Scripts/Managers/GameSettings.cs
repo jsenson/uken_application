@@ -19,12 +19,8 @@ public static class GameSettings {
     public static int level { 
         get { return _level; }
         set {
-            value = Mathf.Clamp(value, 1, _maxLevel);
-
-            if(_level != value) {
-                _level = value;
-                if(onLevelChanged != null) onLevelChanged(_level);
-            }
+            _level = Mathf.Clamp(value, 1, _maxLevel);
+            if(onLevelChanged != null) onLevelChanged(_level);
         }
     }
 
@@ -47,7 +43,7 @@ public static class GameSettings {
 
     // Note: Level settings are simply hard coded here to save time and effort.  A proper system would have a LevelManager that loads from ScriptableObjects created in the editor.
     public static LevelSettings GetLevelSettings(int level) {
-        if(level == 1) return new LevelSettings(8, 10, 200, 6);
+        if(level == 1) return new LevelSettings(8, 10, 60, 6);
         else if(level == 2) return new LevelSettings(12, 10, 200, 10);
         else return new LevelSettings(15, 10, 200, 14);
     }

@@ -15,6 +15,7 @@ public class TimerBar : MonoBehaviourSingleton<TimerBar> {
     public float time { get; private set; }
     public float percent { get { return time / _maxTime; } }
 
+    private float _matchRewardTime = 1f;
     private float _maxTime = 200;
     private bool _active = false;
     private float _lastPercent = float.MaxValue;
@@ -29,11 +30,13 @@ public class TimerBar : MonoBehaviourSingleton<TimerBar> {
     void OnEnable() {
         GameSettings.onLevelChanged += UpdateMaxTime;
         GridController.onAllTilesCleared += Pause;
+        SpriteTile.onTilesMatched += OnMatch;
     }
 
     void OnDisable() {
         GameSettings.onLevelChanged -= UpdateMaxTime;
         GridController.onAllTilesCleared -= Pause;
+        SpriteTile.onTilesMatched -= OnMatch;
     }
 
     public void Play() {
@@ -50,15 +53,15 @@ public class TimerBar : MonoBehaviourSingleton<TimerBar> {
 
             _timerBar.fillAmount = percent;
 
-            if(_lastPercent > _warningThreshold && percent <= _warningThreshold) SetWarningActive(true);
-            else if(_lastPercent <= _warningThreshold && percent > _warningThreshold) SetWarningActive(false);
+            if(_lastPercent > _warningThreshold && _timerBar.fillAmount <= _warningThreshold) SetWarningActive(true);
+            else if(_lastPercent <= _warningThreshold && _timerBar.fillAmount > _warningThreshold) SetWarningActive(false);
 
             if(time <= 0) {
                 Pause();
                 if(onTimeExpired != null) onTimeExpired();
             }
 
-            _lastPercent = time;
+            _lastPercent = _timerBar.fillAmount;
         }
     }
 
@@ -80,8 +83,12 @@ public class TimerBar : MonoBehaviourSingleton<TimerBar> {
     public void Reset() {
         _active = false;
         time = _maxTime;
-        _lastPercent = _maxTime;
+        _lastPercent = 1;
         SetWarningActive(false);
+    }
+
+    void OnMatch(SpriteTile t1, SpriteTile t2) {
+        time = Mathf.Clamp(time + _matchRewardTime, 0, _maxTime);
     }
 
     IEnumerator AnimateWarning(float frequency) {
