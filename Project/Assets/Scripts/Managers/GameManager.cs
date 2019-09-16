@@ -17,12 +17,6 @@ public class GameManager : MonoBehaviourSingleton<GameManager> {
         return true;
     }
 
-    void Start() {
-        // Start level one after the grid has initialized in Awake
-        TimerBar.Instance.Reset();
-        StartGame();
-    }
-
     void OnEnable() {
         GridController.onAllTilesCleared += OnGridCleared;
     }
