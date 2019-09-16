@@ -50,9 +50,10 @@ public class GridController : MonoBehaviour {
                 }
             }
         }
+
+        FixUnwinnables();
     }
 
-    // TODO: Rewrite to generate a solvable grid from the beginning.  Don't shuffle these and pick random locations in ResetGrid while pathing to make sure they've valid.
     SpriteTileInfo[] GetRandomTilePairs(int uniqueTileCount, int totalTileCount) {
         if(uniqueTileCount > _tileSet.Length) {
             Debug.LogWarning("GridController: Not enough unique tiles in tileSet.");
@@ -73,6 +74,36 @@ public class GridController : MonoBehaviour {
         tiles.Shuffle();
 
         return tiles;
+    }
+
+    void FixUnwinnables() {
+        bool done = false;
+
+        // repeat until no cross patterns are detected
+        do {
+            done = true;
+
+            for(int x = 1; x < _grid.columns - 2; x++) {
+                for(int y = 1; y < _grid.rows - 2; y++) {
+                    // Check for 'crosses' of tiles that result in an unwinnable puzzle.
+                    // [ n3, n4 ]
+                    // [ n1, n2 ]
+                    GridNode n1 = _grid[x,y];
+                    GridNode n2 = _grid[x+1,y];
+                    GridNode n3 = _grid[x,y+1];
+                    GridNode n4 = _grid[x+1,y+1];
+
+                    // Pattern is unwinnable if n1 == n4 and n2 == n3
+                    if(n1.tile != null && n2.tile != null && n3.tile != null && n4.tile != null && n1.tile.Matches(n4.tile) && n2.tile.Matches(n3.tile)) {
+                        // Swap n1 and n2 to move the pattern
+                        SpriteTile t = n2.tile;
+                        n1.tile.SetGridNode(n2);
+                        t.SetGridNode(n1);
+                        done = false;
+                    }
+                }
+            }
+        } while(!done);
     }
 
     void OnTilesMatched(SpriteTile tile1, SpriteTile tile2) {
