@@ -6,11 +6,12 @@ public class SelectionManager : MonoBehaviour {
     [SerializeField] private GameObject _selectionBox = null;
 
     private SpriteTile _currentTile = null;
+    private SpriteRenderer _selectionBoxRenderer = null;
 
     void Start() {
         if(_selectionBox != null) {
-            _selectionBox.transform.localPosition = new Vector3(0, 0, -0.01f);
             _selectionBox.SetActive(false);
+            _selectionBoxRenderer = _selectionBox.GetComponent<SpriteRenderer>();
         }
     }
 
@@ -58,8 +59,14 @@ public class SelectionManager : MonoBehaviour {
             
             if(_selectionBox != null) {
                 _selectionBox.SetActive(true);
-                _selectionBox.transform.SetParent(tile.transform, false);
-                _selectionBox.transform.localPosition = new Vector3(0, 0, -0.01f);  // Set the selection box slightly in front of the tile
+
+                // Set the selection slightly in front of the tile
+                Vector3 pos = tile.transform.position;
+                pos.z -= 0.01f;
+                _selectionBox.transform.position = pos;
+
+                // Set the selection to the same size as the grid node
+                _selectionBox.transform.localScale = tile.gridNode.size / _selectionBoxRenderer.sprite.bounds.size;
             }
         } else {
             if(_selectionBox != null) _selectionBox.SetActive(false);

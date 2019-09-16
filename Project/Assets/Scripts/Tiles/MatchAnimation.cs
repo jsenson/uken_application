@@ -31,6 +31,17 @@ public class MatchAnimation : MonoBehaviour {
         }
     }
 
+    // Stop and remove the animation destroying the active orphaned tile since we have no access to the pool that spawned it.
+    // May cause the original tile pool to spawn more tiles in the future if needed.
+    public void StopAndDestroy() {
+        if(playing) {
+            if(_animationRoutine != null) StopCoroutine(_animationRoutine);
+            Destroy(startTile.gameObject);
+            if(_line != null) LinePoolManager.Instance.PushLine(_line);
+            Destroy(this);
+        }
+    }
+
     private IEnumerator AnimateTiles(Vector2[] points, float duration) {
         if(onAnimationStart != null) onAnimationStart(this);
 

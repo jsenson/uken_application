@@ -16,4 +16,4 @@ MonoBehaviour:
   _sprite: {fileID: 21300000, guid: 527bc05d0b5323a4289dbdf52e1b1ed6, type: 3}
   _pointValue: 1
   _defaultColor: {r: 1, g: 1, b: 1, a: 1}
-  _highlightColor: {r: 0.7058824, g: 0.7058824, b: 0.7058824, a: 1}
+  _highlightColor: {r: 1, g: 1, b: 1, a: 1}
