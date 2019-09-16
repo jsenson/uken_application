@@ -44,6 +44,7 @@ public class SpriteTile : MonoBehaviour, IPointerClickHandler {
         _currentNode = node;
 
         if(_currentNode != null) {
+            if(_currentNode.tile != null) _currentNode.tile.SetGridNode(null);
             _currentNode.tile = this;
             _currentNode.pathfindingWeight = -1;
             transform.position = _currentNode.worldPosition;
