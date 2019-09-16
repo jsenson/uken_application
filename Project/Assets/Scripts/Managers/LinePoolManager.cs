@@ -4,6 +4,7 @@ using UnityEngine;
 using ToN.Singletons;
 using ToN.ObjectPooling;
 
+// Singleton accessor for an object pool of Line Renderers to use when drawing animated paths.
 public class LinePoolManager : MonoBehaviourSingleton<LinePoolManager> {
     [SerializeField] private LineRenderer _linePrefab = null;
     

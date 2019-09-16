@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// This handles animating two tiles together to form a match.  Fires start and end events as well as spawns and manages the line renderer for the display.
 public class MatchAnimation : MonoBehaviour {
     public static event System.Action<MatchAnimation> onAnimationStart;
     public static event System.Action<MatchAnimation> onAnimationEnd;
@@ -14,12 +15,15 @@ public class MatchAnimation : MonoBehaviour {
     private Coroutine _animationRoutine = null;
     
     void OnDestroy() {
+        // Make sure we return the line to the pool.  MonoBehaviourSingleton Instances can become null during the OnDestroy phase so make sure to check that it exists.
         if(_line != null && LinePoolManager.Instance != null) {
             LinePoolManager.Instance.PushLine(_line);
             _line = null;
         }
     }
 
+    // Start animating the tiles.  The 'start' tile will be removed from the grid immediately and moved along the given AStar path until it reaches 'end'
+    // moveDuration is the duration it takes to travel along each straight line in the path.
     public void Play(SpriteTile start, SpriteTile end, IAStarNode[] path, float moveDuration = 0.4f) {
         if(!playing) {
             playing = true;
@@ -45,21 +49,27 @@ public class MatchAnimation : MonoBehaviour {
     private IEnumerator AnimateTiles(Vector2[] points, float duration) {
         if(onAnimationStart != null) onAnimationStart(this);
 
+        // Make sure we disable collisions with the matches tiles
         endTile.SetColliderEnabled(false);
         startTile.SetColliderEnabled(false);
+
+        // Shift the start tile up slightly so it renders above other grid tiles and the line
         startTile.transform.position += new Vector3(0, 0, -0.2f);
         if(startTile.gridNode != null) startTile.gridNode.Clear();
 
+        // Place the line between the depths of start and end
         _line = LinePoolManager.Instance.PopLine();
         SetLinePositions(_line, points, startTile.transform.position.z + 0.1f);
 
         for(int i = 0; i < points.Length - 1; i++) {
             float timer = 0f;
+            // Pre-calculate the division
             float durationInverse = 1f / duration;
 
             while(timer <= 1f) {
                 yield return null;
 
+                // Lerp between the two key points in the path based on the timer
                 timer += Time.deltaTime * durationInverse;
                 Vector3 newPos = (Vector3)Vector2.Lerp(points[i], points[i + 1], EaseSineInOut(timer));
                 newPos.z = startTile.transform.position.z;
@@ -67,16 +77,20 @@ public class MatchAnimation : MonoBehaviour {
             }
         }
 
+        // Clean up
         _animationRoutine = null;
         LinePoolManager.Instance.PushLine(_line);
         _line = null;
 
+        // Fire the end event before we destroy ourselves
         if(onAnimationEnd != null) onAnimationEnd(this);
 
+        // Kill the animation script and tell the tiles to match with each other
         Destroy(this);
         SpriteTile.MatchTiles(startTile, endTile);
     }
 
+    // Updates the line renderer with the given points in the path array
     private void SetLinePositions(LineRenderer line, Vector2[] points, float zPosition) {
         line.positionCount = points.Length;
         for(int i = 0; i < points.Length; i++) {
@@ -84,6 +98,7 @@ public class MatchAnimation : MonoBehaviour {
         }
     }
 
+    // Collects only the key points along the AStar path, ignoring any in between.  These are the start, end, and any points where the direction of travel changes.
     private Vector2[] GetKeyWorldPoints(IAStarNode[] path) {
         if(path.Length < 2) throw new System.ArgumentException("MatchAnimation called with an invalid path. IAStarNode[] must contain at least two elements.");
 

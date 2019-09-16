@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 
+// Simple audio player to start the music and react to matches with a sound effect.
 public class AudioPlayer : MonoBehaviour {
     [SerializeField] private AudioSource _music = null;
     [SerializeField] private AudioSource _matchEffect = null;

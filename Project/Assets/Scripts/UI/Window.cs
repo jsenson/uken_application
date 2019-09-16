@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Base Window class that opens and closes based on animations in an Animator component.
+// Animations must have an "Open" and "Close" state on the base layer and an 'open' boolean parameter
 [RequireComponent(typeof(Animator))]
 public class Window : MonoBehaviour {
     public static event System.Action<Window> onWindowOpening;
@@ -11,6 +13,7 @@ public class Window : MonoBehaviour {
 
     public bool isOpen { get; private set; }
 
+    // The name of the boolean parameter that controls transitions in the Animator
     private const string kOpenFlag = "open";
 
     private Animator _animator = null;
@@ -21,6 +24,7 @@ public class Window : MonoBehaviour {
     protected virtual void Awake() {
         _animator = GetComponent<Animator>();
         
+        // Store the hashes for the two main animation state names
         _openHash = Animator.StringToHash("Base Layer.Open");
         _closeHash = Animator.StringToHash("Base Layer.Close");
 
@@ -48,6 +52,8 @@ public class Window : MonoBehaviour {
         _closeRoutine = StartCoroutine(WaitForAnimation(0, _closeHash, OnClosed));
     }
 
+    // Wait for the end of the given animation to complete before running the onComplete callback.
+    // May not work with looping animations. Not tested.
     private IEnumerator WaitForAnimation(int layer, int pathHash, System.Action onComplete) {
         bool done = false;
 
@@ -55,6 +61,9 @@ public class Window : MonoBehaviour {
             yield return null;
             AnimatorStateInfo currState = _animator.GetCurrentAnimatorStateInfo(layer);
             AnimatorStateInfo nextState = _animator.GetNextAnimatorStateInfo(layer);
+
+            // Need to check both current and next animation state since we could be in a transition to the one we're waiting for.
+            // If the next state isn't what we're looking for and we're at the end of the current one we must be finished waiting.
             done = nextState.fullPathHash != pathHash && currState.normalizedTime >= 1;
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 
 public static class ArrayExtensions {
+    // Fisher-Yates shuffle
     public static void Shuffle<T>(this T[] array) {
         Random rng = new Random();
         int n = array.Length;

@@ -1,12 +1,18 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+// A general node for our game Grid, specialized to hold a SpriteTile.
 public class GridNode : IAStarNode {
+    // Sets the weight for this node to use during pathfinding.  < 0 means the tile in't walkable, otherwise higher numbers are harder to traverse.
     public float pathfindingWeight { get; set; }
 
+    // The current tile connected to this node.
     public SpriteTile tile { get; set; }
+    // The x,y coordinated of the node in the grid
     public Vector2 coordinates { get; private set; }
+    // The world position of the mode based on the position of its parent grid
     public Vector2 worldPosition { get { return _grid != null ? _grid.ConvertToWorldPosition(coordinates) : coordinates; } }
+    // The world unit size of the grid cell
     public Vector2 size { get { return _grid != null ? _grid.cellSize : Vector2.one; } }
 
     private List<IAStarNode> _neighbours;

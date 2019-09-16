@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// A shared window to handle Pause, Level Complete, Game Over, and Game Complete since they all share almost the same exact layout with very little variation.
 public class SharedUIWindow : Window {
     [SerializeField] private bool _pauseWhileOpen = true;
     [SerializeField] private TextMeshProUGUI _message = null;
@@ -43,22 +44,26 @@ public class SharedUIWindow : Window {
         GameManager.onGameComplete -= OpenGameComplete;
     }
 
+    // Pause the game when open
     protected override void OnOpening() {
         base.OnOpening();
         if(_pauseWhileOpen) Time.timeScale = 0;
     }
 
+    // Unpause when closed
     protected override void OnClosed() {
         if(_pauseWhileOpen) Time.timeScale = 1;
         base.OnClosed();
     }
 
+    // Opens the Pause menu
     public void OpenPause() {
         SetButtonsActive(false, true, true, true);
         _message.text = kPauseMessage;
         Open();
     }
 
+    // Opens the Level Complete menu
     public void OpenLevelComplete(int level = 1) {
         if(level == GameSettings.maxLevel) return;  // Ignore this message on the last level since onGameComplete will also fire.
         SetButtonsActive(true, false, false, false);
@@ -66,18 +71,21 @@ public class SharedUIWindow : Window {
         Open();
     }
 
+    // Opens the Game Over menu
     public void OpenGameOver() {
         SetButtonsActive(false, true, false, true);
         _message.text = string.Format(kGameOverMessage, GameSettings.score);
         Open();
     }
 
+    // Opens the Game Compelte menu
     public void OpenGameComplete() {
         SetButtonsActive(false, true, false, true);
         _message.text = string.Format(kGameCompleteMessage, GameSettings.score);
         Open();
     }
 
+    // Helper to set all buttons on or off as needed
     void SetButtonsActive(bool next, bool reset, bool close, bool quit) {
         _nextButton.gameObject.SetActive(next);
         _restartButton.gameObject.SetActive(reset);

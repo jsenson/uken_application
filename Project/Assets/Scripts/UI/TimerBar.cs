@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using ToN.Singletons;
 
+// Handles display and tracking of the level timer
 public class TimerBar : MonoBehaviourSingleton<TimerBar> {
     public static event System.Action onTimeExpired;
 
@@ -15,7 +16,6 @@ public class TimerBar : MonoBehaviourSingleton<TimerBar> {
     public float time { get; private set; }
     public float percent { get { return time / _maxTime; } }
 
-    private float _matchRewardTime = 1f;
     private float _maxTime = 200;
     private bool _active = false;
     private float _lastPercent = float.MaxValue;
@@ -53,18 +53,22 @@ public class TimerBar : MonoBehaviourSingleton<TimerBar> {
 
             _timerBar.fillAmount = percent;
 
+            // Check for activating or deactivating the warning animation
             if(_lastPercent > _warningThreshold && _timerBar.fillAmount <= _warningThreshold) SetWarningActive(true);
             else if(_lastPercent <= _warningThreshold && _timerBar.fillAmount > _warningThreshold) SetWarningActive(false);
 
+            // Trigger the expired event when we're out of time
             if(time <= 0) {
                 Pause();
                 if(onTimeExpired != null) onTimeExpired();
             }
 
+            // Track the previous time percentage for checking the warning threshold
             _lastPercent = _timerBar.fillAmount;
         }
     }
 
+    // Enable of disable the warning animation coroutine
     void SetWarningActive(bool active) {
         if(active && _warningRoutine == null) {
             _warningRoutine = StartCoroutine(AnimateWarning(0.5f));
@@ -75,11 +79,13 @@ public class TimerBar : MonoBehaviourSingleton<TimerBar> {
         }
     }
 
+    // Set the maximum time for the timer.  This will reset the timer to full.
     void UpdateMaxTime(int level) {
         _maxTime = GameSettings.GetLevelSettings(level).timeLimit;
         Reset();
     }
 
+    // Resets the timer state
     public void Reset() {
         _active = false;
         time = _maxTime;
@@ -87,10 +93,12 @@ public class TimerBar : MonoBehaviourSingleton<TimerBar> {
         SetWarningActive(false);
     }
 
+    // Add bonus time whenever there's a match
     void OnMatch(SpriteTile t1, SpriteTile t2) {
-        time = Mathf.Clamp(time + _matchRewardTime, 0, _maxTime);
+        time = Mathf.Clamp(time + GameSettings.timeBonusPerMatch, 0, _maxTime);
     }
 
+    // Animates a colour pulse on the time at the given frequency
     IEnumerator AnimateWarning(float frequency) {
         float timer;
         float inverse = 1f / frequency;;
@@ -102,6 +110,7 @@ public class TimerBar : MonoBehaviourSingleton<TimerBar> {
         
             while(timer <= frequency) {
                 timer += Time.deltaTime;
+                // Lerp the color back and forth between the two
                 _timerBar.color = Color.Lerp(_defaultColor, _warningColor, forward ? timer * inverse : 1 - timer * inverse);
                 yield return null;
             }
