@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e708b852a6ccbb3488c2f13cf66e4bc1, type: 3}
   m_Name: Tile1
   m_EditorClassIdentifier: 
-  _tileName: t1
-  _sprite: {fileID: 21300000, guid: 6dfe9ea179aef114d87fb4c688d347b0, type: 3}
+  _tileName: aqua
+  _sprite: {fileID: 21300000, guid: 54cb0168d5c5fb84f917f93bfb83682c, type: 3}
   _pointValue: 1
   _defaultColor: {r: 1, g: 1, b: 1, a: 1}
   _highlightColor: {r: 0.7058824, g: 0.7058824, b: 0.7058824, a: 1}

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e708b852a6ccbb3488c2f13cf66e4bc1, type: 3}
   m_Name: Tile4
   m_EditorClassIdentifier: 
-  _tileName: t4
-  _sprite: {fileID: 21300000, guid: 9600ecbb9df3c3944be208c7560c1c79, type: 3}
+  _tileName: fmario
+  _sprite: {fileID: 21300000, guid: ee388e2d79ecbdc45857f9e37f2f3679, type: 3}
   _pointValue: 1
   _defaultColor: {r: 1, g: 1, b: 1, a: 1}
   _highlightColor: {r: 0.7058824, g: 0.7058824, b: 0.7058824, a: 1}

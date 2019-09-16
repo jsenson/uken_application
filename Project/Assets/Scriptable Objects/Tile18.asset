@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e708b852a6ccbb3488c2f13cf66e4bc1, type: 3}
-  m_Name: Tile6
+  m_Name: Tile18
   m_EditorClassIdentifier: 
-  _tileName: goom
-  _sprite: {fileID: 21300000, guid: 923c6678a1e9ae043a5b068cf13f0bc1, type: 3}
+  _tileName: zss-samus
+  _sprite: {fileID: 21300000, guid: 09ac71739a2a9fd48a6486ad23d66d8d, type: 3}
   _pointValue: 1
   _defaultColor: {r: 1, g: 1, b: 1, a: 1}
   _highlightColor: {r: 0.7058824, g: 0.7058824, b: 0.7058824, a: 1}

@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e708b852a6ccbb3488c2f13cf66e4bc1, type: 3}
   m_Name: Tile3
   m_EditorClassIdentifier: 
-  _tileName: t3
-  _sprite: {fileID: 21300000, guid: 57251df6a5af680428fbdb3f18deb1fa, type: 3}
+  _tileName: dodo
+  _sprite: {fileID: 21300000, guid: 527bc05d0b5323a4289dbdf52e1b1ed6, type: 3}
   _pointValue: 1
   _defaultColor: {r: 1, g: 1, b: 1, a: 1}
   _highlightColor: {r: 0.7058824, g: 0.7058824, b: 0.7058824, a: 1}

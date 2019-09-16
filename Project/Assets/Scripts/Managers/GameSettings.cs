@@ -43,8 +43,8 @@ public static class GameSettings {
 
     // Note: Level settings are simply hard coded here to save time and effort.  A proper system would have a LevelManager that loads from ScriptableObjects created in the editor.
     public static LevelSettings GetLevelSettings(int level) {
-        if(level == 1) return new LevelSettings(8, 10, 60, 6);
-        else if(level == 2) return new LevelSettings(12, 10, 200, 10);
-        else return new LevelSettings(15, 10, 200, 14);
+        if(level == 1) return new LevelSettings(10, 10, 70, 12);
+        else if(level == 2) return new LevelSettings(14, 10, 100, 16);
+        else return new LevelSettings(17, 10, 180, 20);
     }
 }
