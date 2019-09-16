@@ -85,8 +85,6 @@ public class GridController : MonoBehaviour {
     }
 
     void OnAllTilesCleared() {
-        Debug.Log("Game over!");
         if(onAllTilesCleared != null) onAllTilesCleared();
-        GameManager.Instance.LoadNextLevel();
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using ToN.Singletons;
 
 public class GameManager : MonoBehaviourSingleton<GameManager> {
+    public static event System.Action<int> onLevelComplete;
     public static event System.Action onGameComplete;
 
     [SerializeField] private GridController _gridController = null;
@@ -22,13 +23,17 @@ public class GameManager : MonoBehaviourSingleton<GameManager> {
         StartGame();
     }
 
+    void OnEnable() {
+        GridController.onAllTilesCleared += OnGridCleared;
+    }
+
+    void OnDisable() {
+        GridController.onAllTilesCleared -= OnGridCleared;
+    }
+
     public void LoadNextLevel() {
-        if(GameSettings.level == GameSettings.maxLevel) {
-            if(onGameComplete != null) onGameComplete();
-        } else {
-            GameSettings.level++;
-            StartGame();
-        }
+        GameSettings.level++;
+        StartGame();
     }
 
     public void ResetGame() {
@@ -44,5 +49,10 @@ public class GameManager : MonoBehaviourSingleton<GameManager> {
     void StartGame() {
         _gridController.InitializeGrid();
         TimerBar.Instance.Play();
+    }
+
+    void OnGridCleared() {
+        if(onLevelComplete != null) onLevelComplete(GameSettings.level);
+        if(GameSettings.level == GameSettings.maxLevel && onGameComplete != null) onGameComplete();
     }
 }
