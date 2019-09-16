@@ -6,6 +6,7 @@ using ToN.Singletons;
 public class GameManager : MonoBehaviourSingleton<GameManager> {
     public static event System.Action<int> onLevelComplete;
     public static event System.Action onGameComplete;
+    public static event System.Action onGameReset;
 
     [SerializeField] private GridController _gridController = null;
 
@@ -33,6 +34,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager> {
     public void ResetGame() {
         GameSettings.level = 1;
         GameSettings.score = 0;
+        if(onGameReset != null) onGameReset();
         StartGame();
     }
 

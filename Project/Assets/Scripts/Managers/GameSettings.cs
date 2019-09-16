@@ -36,10 +36,12 @@ public static class GameSettings {
 
     public static LevelSettings currentLevelSettings { get { return GetLevelSettings(_level); } }
     public static int maxLevel { get { return _maxLevel; } }
+    public static int maxPathfindingTurns { get { return _maxPathfindingTurns; } }
 
     private static int _level = 1;
     private static int _maxLevel = 3;
     private static int _score = 0;
+    private static int _maxPathfindingTurns = 2;
 
     // Note: Level settings are simply hard coded here to save time and effort.  A proper system would have a LevelManager that loads from ScriptableObjects created in the editor.
     public static LevelSettings GetLevelSettings(int level) {
